@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="webContext" class="org.eclipse.jetty.webapp.WebAppContext">
+        <property name="contextPath" value="/"/>
+        <property name="resourceBase" value="webapp"/>
+        <property name="logUrlOnStart" value="true"/>
+    </bean>
+    <bean id="httpsConfig" class="org.eclipse.jetty.server.HttpConfiguration">
+        <property name="secureScheme" value="https"/>
+    </bean>
+    <bean id="sslContextFactory" class="org.eclipse.jetty.util.ssl.SslContextFactory">
+        <property name="keyStorePath" value="webapp/keystore"/>
+        <property name="keyStorePassword" value="zmlpwd"/>
+        <property name="keyManagerPassword" value="zmljettypwd" />
+    </bean>
+    <bean id="factories" class="org.eclipse.jetty.server.HttpConnectionFactory">
+        <constructor-arg ref="httpsConfig"/>
+    </bean>
+    <bean id="server" class="org.eclipse.jetty.server.Server">
+        <property name="connectors">
+            <list>
+                <bean class="org.eclipse.jetty.server.ServerConnector">
+                    <constructor-arg ref="server"/>
+                    <constructor-arg ref="sslContextFactory"/>
+                    <constructor-arg ref="factories"/>
+                    <property name="host" value="0.0.0.0"/>
+                    <property name="port" value="8082"/>
+                    <property name="idleTimeout" value="#{24 * 60 * 60 * 1000}" />
+                </bean>
+            </list>
+        </property>
+
+        <property name="handler" ref="webContext" />
+    </bean>
+
+</beans>
